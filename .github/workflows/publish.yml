@@ -24,7 +24,7 @@ jobs:
           pip install setuptools wheel
           python setup.py sdist bdist_wheel
           pip install twine
-          python -m twine upload --repository-url https://upload.github.com/Plantigo/plantigo-common dist/*
+          python -m twine upload --repository-url https://upload.pypi.org/legacy/ --verbose dist/*
         env:
           TWINE_USERNAME: "${{ secrets.GITHUB_ACTOR }}"
           TWINE_PASSWORD: "${{ secrets.GITHUB_TOKEN }}"
