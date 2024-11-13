@@ -1,0 +1,30 @@
+name: Publish Python Package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Build and publish to GitHub Packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel
+          python setup.py sdist bdist_wheel
+          pip install twine
+          python -m twine upload --repository-url https://upload.github.com/Plantigo/plantigo-common dist/*
+        env:
+          TWINE_USERNAME: "${{ secrets.GITHUB_ACTOR }}"
+          TWINE_PASSWORD: "${{ secrets.GITHUB_TOKEN }}"
