@@ -1,38 +1,36 @@
+from typing import Any, Callable
 import grpc
-from fastapi import HTTPException
 from plantigo_common.auth.token_service import verify_token
+from grpc_interceptor import ServerInterceptor
+from grpc_interceptor.exceptions import GrpcException
 
 
-class AuthInterceptor(grpc.ServerInterceptor):
+class AuthInterceptor(ServerInterceptor):
 
     def __init__(self, jwt_secret_key: str, jwt_algorithm: str):
         self.jwt_secret_key = jwt_secret_key
         self.jwt_algorithm = jwt_algorithm
 
-    def intercept_service(self, continuation, handler_call_details):
-        metadata = dict(handler_call_details.invocation_metadata)
-        auth_token = metadata.get("authorization")
+    def intercept(
+        self,
+        method: Callable[..., Any],
+        request_or_iterator: Any,
+        context: grpc.ServicerContext,
+        method_name: str,
+    ) -> Any:
+        auth_token = context.invocation_metadata().get("authorization")
 
         if not auth_token or not auth_token.startswith("Bearer "):
-            return grpc.unary_unary_rpc_method_handler(
-                lambda request, context: context.abort(
-                    grpc.StatusCode.UNAUTHENTICATED, "Unauthenticated"
-                )
-            )
+            context.abort(grpc.StatusCode.UNAUTHENTICATED, "Unauthenticated")
 
         token = auth_token.split(" ")[1]
 
         try:
             token_data = verify_token(token, self.jwt_secret_key, self.jwt_algorithm)
             user_id = token_data.get("user_id")
-        except HTTPException as e:
-            return grpc.unary_unary_rpc_method_handler(
-                lambda request, context: context.abort(
-                    grpc.StatusCode.UNAUTHENTICATED, "Unauthenticated"
-                )
-            )
-
-        context = handler_call_details.invocation_metadata
-        context.user_id = user_id
-
-        return continuation(handler_call_details)
+            context.user_id = user_id
+            return method(request_or_iterator, context)
+        except GrpcException as e:
+            context.set_code(e.status_code)
+            context.set_details(e.details)
+            raise
