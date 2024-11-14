@@ -8,7 +8,7 @@ authors = ["Jakub Aniszewski <jakubaniszewski@pm.me>"]
 python = "^3.8"
 fastapi = ">=0.70.0"
 grpcio = ">=1.39.0"
-grpc-interceptor> = ">=0.15.4"
+grpc-interceptor = ">=0.15.4"
 
 [tool.poetry.publish]
 repository = "https://upload.pypi.org/legacy/"
