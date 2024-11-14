@@ -24,11 +24,15 @@ class AuthInterceptor(grpc.ServerInterceptor):
 
         try:
             token_data = verify_token(token, self.jwt_secret_key, self.jwt_algorithm)
+            user_id = token_data.get("user_id")
         except HTTPException as e:
             return grpc.unary_unary_rpc_method_handler(
                 lambda request, context: context.abort(
                     grpc.StatusCode.UNAUTHENTICATED, "Unauthenticated"
                 )
             )
+
+        context = handler_call_details.invocation_metadata
+        context.user_id = user_id
 
         return continuation(handler_call_details)
