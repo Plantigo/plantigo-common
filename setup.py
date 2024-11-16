@@ -7,7 +7,8 @@ setup(
     install_requires=[
         "fastapi>=0.70.0",
         "grpcio>=1.39.0",
-        "grpc-interceptor>=0.15.4" "python-jose>=3.3.0",
+        "grpc-interceptor>=0.15.4",
+        "python-jose>=3.3.0",
     ],
     description="Reusable modules for Plantigo project",
     author="jakubaniszewski@pm.me",
