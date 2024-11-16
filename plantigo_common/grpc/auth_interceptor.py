@@ -18,7 +18,7 @@ class AuthInterceptor(ServerInterceptor):
         context: grpc.ServicerContext,
         method_name: str,
     ) -> Any:
-        auth_token = context.invocation_metadata().get("authorization")
+        auth_token = dict(context.invocation_metadata()).get("authorization")
 
         if not auth_token or not auth_token.startswith("Bearer "):
             context.abort(grpc.StatusCode.UNAUTHENTICATED, "Unauthenticated")
