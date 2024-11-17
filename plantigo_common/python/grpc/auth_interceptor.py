@@ -1,6 +1,6 @@
 from typing import Any, Callable
 import grpc
-from plantigo_common.auth.token_service import verify_token
+from plantigo_common.python.auth.token_service import verify_token
 from grpc_interceptor import ServerInterceptor
 from grpc_interceptor.exceptions import GrpcException
 
