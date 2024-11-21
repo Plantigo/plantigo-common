@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "plantigo-common"
-version = "1.0.9"
+version = "1.1.0"
 description = "Common Python utilities for Plantigo"
 authors = ["Jakub Aniszewski <jakubaniszewski@pm.me>"]
 

@@ -107,12 +107,13 @@ class GRPCServiceFacade:
         self.client = GRPCClient(service_config.stub, service_config.address)
         self.request_classes = service_config.request_classes
 
-    def call(self, method: str):
+    def call(self, method: str, grpc_request: GRPCRequest):
         """
-        Calls a method in the gRPC service.
+        Calls a method in the gRPC service with a request object.
 
         Args:
             method: The name of the gRPC method.
+            grpc_request: The gRPC request object.
 
         Returns:
             The response from the gRPC service.
@@ -120,7 +121,6 @@ class GRPCServiceFacade:
         if method not in self.request_classes:
             raise ValueError(f"Method '{method}' not configured for service '{self.service_name}'")
 
-        grpc_request = self.request_classes[method]()
         return self.client.call_method(method, grpc_request, metadata=self.metadata)
 
 
@@ -158,7 +158,11 @@ class GRPCServiceFactory:
             def __getattr__(self, name):
                 method_name = "".join(part.capitalize() for part in name.split("_"))
                 if method_name in self.request_classes:
-                    return lambda: self.call(method_name)
+                    def dynamic_method(**kwargs):
+                        grpc_request = self.request_classes[method_name](**kwargs)
+                        return self.call(method_name, grpc_request)
+
+                    return dynamic_method
                 raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
         return DynamicGRPCService

@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="plantigo-common",
-    version="1.0.9",
+    version="1.1.0",
     packages=find_packages(),
     install_requires=[
         "fastapi>=0.70.0",
